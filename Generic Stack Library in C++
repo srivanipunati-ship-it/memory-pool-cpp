@@ -1,0 +1,40 @@
+#include<iostream>
+using namespace std;
+template<typename T>
+struct sunny{
+    int top=0;
+    T arr[100]={};
+
+
+void other(T item){
+    if(top!=100){
+        arr[top]=item;
+        top++;
+        cout<<"token"<<top<<endl;
+    }
+};
+T other(){
+    if(top>0){
+        top--;
+        return arr[top];
+    }
+} bool add(){
+    return top==0;
+    
+}T sub(){
+    if(top>0){
+        return arr[top-1];
+    }
+}};
+
+int main(){
+    sunny<int>s;
+    s.other(10);
+    s.other(20);
+    s.other(30);
+    s.other();
+    
+    
+}
+
+
