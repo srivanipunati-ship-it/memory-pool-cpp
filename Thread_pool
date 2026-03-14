@@ -1,0 +1,47 @@
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
+#include <thread>
+#include <vector>
+#include <functional>
+using namespace std;
+
+class sunny {
+public:
+    mutex m;
+    condition_variable cv;
+    queue<function<void()>> jobs;
+    vector<thread> workers;
+    bool stop = false;
+
+    void worker() {
+        while (true) {
+            unique_lock<mutex> lg(m);
+            cv.wait(lg, [this] { return !jobs.empty() || stop; });
+
+            if (stop && jobs.empty()) {
+                break;
+            } else {
+                auto job = jobs.front();
+                jobs.pop();
+                lg.unlock();
+                job();
+            }
+        }
+    }
+
+    void addTask(function<void()> task) {
+        unique_lock<mutex> lg(m);
+        jobs.push(task);
+        cv.notify_one();
+    }
+};
+
+int main() {
+    sunny pool;
+    thread t1(&sunny::worker, &pool);
+    thread t2(&sunny::worker, &pool);
+    t1.join();
+    t2.join();
+}
